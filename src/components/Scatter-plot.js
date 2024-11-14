@@ -1,5 +1,9 @@
 import * as d3 from 'd3';
 
+const COLOR_HOLIDAY = "purple";
+const COLOR_NO_HOLIDAY = "green";
+const OPACITY = 0.2;
+
 class ScatterplotD3 {
   constructor(element) {
     this.element = element;
@@ -44,16 +48,21 @@ class ScatterplotD3 {
       .attr('class', 'x-axis-label')
       .attr('text-anchor', 'end')
       .attr('x', width)
-      .attr('y', height + margin.bottom )
+      .attr('y', height + margin.bottom - 5)
       .text('X Axis Label');
 
     this.svg.append('text')
       .attr('class', 'y-axis-label')
       .attr('text-anchor', 'end')
-      .attr('x', -margin.left)
-      .attr('y', -30)
+      .attr('x', -margin.left + 5)
+      .attr('y', -10)
       .attr('transform', 'rotate(-90)')
       .text('Y Axis Label');
+
+    // Aggiungi gruppo per la legenda
+    this.legend = this.svg.append('g')
+      .attr('class', 'legend')
+      .attr('transform', `translate(${width - 100}, 20)`);
   }
 
   renderScatterplot(data, xAttribute, yAttribute, controllerMethods) {
@@ -88,7 +97,7 @@ class ScatterplotD3 {
       .attr('cx', d => xScale(d[xAttribute]))
       .attr('cy', d => yScale(d[yAttribute]))
       .attr('r', 3.5)
-      .attr('fill-opacity', 0.2)
+      .attr('fill-opacity', OPACITY)
 
     // Gestisci l'inserimento di nuovi elementi
     circles.enter()
@@ -96,7 +105,7 @@ class ScatterplotD3 {
       .attr('cx', d => xScale(d[xAttribute]))
       .attr('cy', d => yScale(d[yAttribute]))
       .attr('r', 3.5)
-      .attr('fill-opacity', 0.2)
+      .attr('fill-opacity', OPACITY)
       .on('click', controllerMethods.handleOnClick);
 
     // Gestisci la rimozione degli elementi non più presenti nei dati
@@ -121,18 +130,45 @@ class ScatterplotD3 {
   brushed(event) {
     const selection = event.selection;
     if (!selection) {
-      this.svg.selectAll('circle').attr('stroke', 'black');
+      this.svg.selectAll('circle').attr('stroke', null);
+      this.legend.selectAll('*').remove(); // Rimuovi la legenda
     } else {
       const [[x0, y0], [x1, y1]] = selection;
       this.svg.selectAll('circle')
         .attr('stroke', d => {
           if (x0 <= this.xScale(d[this.xAttribute]) && this.xScale(d[this.xAttribute]) <= x1 &&
               y0 <= this.yScale(d[this.yAttribute]) && this.yScale(d[this.yAttribute]) <= y1) {
-            return d.Holiday === "Holiday" ? "purple" : "green";
+            return d.Holiday === "Holiday" ? COLOR_HOLIDAY : COLOR_NO_HOLIDAY;
           } else {
-            return null;
+            return 'null';
           }
         });
+
+      // Aggiungi la legenda
+      this.legend.selectAll('*').remove(); // Rimuovi la legenda esistente
+      this.legend.append('rect')
+        .attr('x', 0)
+        .attr('y', 0)
+        .attr('width', 18)
+        .attr('height', 18)
+        .attr('fill', COLOR_HOLIDAY);
+      this.legend.append('text')
+        .attr('x', 24)
+        .attr('y', 9)
+        .attr('dy', '0.35em')
+        .text('Holiday');
+
+      this.legend.append('rect')
+        .attr('x', 0)
+        .attr('y', 24)
+        .attr('width', 18)
+        .attr('height', 18)
+        .attr('fill', COLOR_NO_HOLIDAY);
+      this.legend.append('text')
+        .attr('x', 24)
+        .attr('y', 33)
+        .attr('dy', '0.35em')
+        .text('No Holiday');
     }
   }
 
