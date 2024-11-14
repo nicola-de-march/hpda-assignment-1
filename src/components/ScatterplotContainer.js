@@ -23,6 +23,8 @@ class ScatterPlotContainer extends Component {
   componentDidUpdate(prevProps) {
     if (prevProps.data !== this.props.data || prevProps.xAttribute !== this.props.xAttribute || prevProps.yAttribute !== this.props.yAttribute) {
       console.log("ScatterPlotContainer updated");
+      console.log("xAttribute:", this.props.xAttribute);
+      console.log("yAttribute:", this.props.yAttribute);
       this.scatterplot.renderScatterplot(this.props.data, this.props.xAttribute, this.props.yAttribute, {
         handleOnClick: this.handleOnClick,
         handleBrush: this.handleBrush
