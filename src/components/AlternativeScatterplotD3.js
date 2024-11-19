@@ -19,15 +19,16 @@ const colorMaps = {
 };
 
 class AlternativeScatterplotD3 {
-  constructor(element) {
+  constructor(element, onDotClick) {
     this.element = element;
+    this.onDotClick = onDotClick;
   }
 
   create({ size }) {
     console.log("Creating alternative scatterplot with size:", size);
 
     // Definisci i margini
-    const margin = { top: 20, right: 30, bottom: 40, left: 50 };
+    const margin = { top: 20, right: 40, bottom: 40, left: 80 };
     const width = size.width - margin.left - margin.right;
     const height = size.height - margin.top - margin.bottom;
 
@@ -61,7 +62,7 @@ class AlternativeScatterplotD3 {
       .attr('class', 'y-axis-label')
       .attr('text-anchor', 'end')
       .attr('x', -margin.left + 5)
-      .attr('y', -30)
+      .attr('y', -40)
       .attr('transform', 'rotate(-90)')
       .text('Y Axis Label');
   }
@@ -114,7 +115,9 @@ class AlternativeScatterplotD3 {
       .attr('r', 0) // Inizia con raggio 0 per l'animazione
       .attr('stroke', 'black')
       .attr('fill', d => colorScale(d[controllerMethods.selectedClass]))
-      .on('click', controllerMethods.handleOnClick)
+      .on('click', (event, d) => {
+        this.onDotClick(d, event);
+      })
       .transition()
       .duration(750)
       .attr('r', 3.5); // Anima il raggio fino a 3.5
