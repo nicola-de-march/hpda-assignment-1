@@ -26,7 +26,6 @@ function App() {
 
   return (
     <div className="App">
-      <Menu onPlot={handlePlot} />
       <div id="view-container" className="row">
         <ScatterPlotContainer data={data} xAttribute={xAttribute} yAttribute={yAttribute} />
       </div>

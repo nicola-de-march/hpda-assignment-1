@@ -2,6 +2,22 @@ import * as d3 from 'd3';
 
 const OPACITY = 0.2;
 
+const colorMaps = {
+  Seasons: {
+    domain: ["Spring", "Summer", "Fall", "Winter"],
+    range: ["green", "yellow", "orange", "blue"]
+  },
+  Holiday: {
+    domain: ["Yes", "No"],
+    range: ["red", "blue"]
+  },
+  FunctioningDay: {
+    domain: ["Yes", "No"],
+    range: ["gray", "purple"]
+  }
+  // Aggiungi altre variabili discrete e le loro colormap qui
+};
+
 class AlternativeScatterplotD3 {
   constructor(element) {
     this.element = element;
@@ -45,7 +61,7 @@ class AlternativeScatterplotD3 {
       .attr('class', 'y-axis-label')
       .attr('text-anchor', 'end')
       .attr('x', -margin.left + 5)
-      .attr('y', -10)
+      .attr('y', -30)
       .attr('transform', 'rotate(-90)')
       .text('Y Axis Label');
   }
@@ -54,6 +70,7 @@ class AlternativeScatterplotD3 {
     console.log("Rendering alternative scatterplot with data:", data);
     console.log("xAttribute:", xAttribute);
     console.log("yAttribute:", yAttribute);
+    console.log("selectedClass:", controllerMethods.selectedClass);
 
     // Salva gli attributi come proprietà dell'istanza
     this.xAttribute = xAttribute;
@@ -61,7 +78,6 @@ class AlternativeScatterplotD3 {
 
     // Filtra i dati nulli
     const filteredData = data.filter(d => d && d[xAttribute] != null && d[yAttribute] != null);
-
 
     const xScale = d3.scaleLinear()
       .domain(d3.extent(filteredData, d => d[xAttribute]))
@@ -71,9 +87,11 @@ class AlternativeScatterplotD3 {
       .domain(d3.extent(filteredData, d => d[yAttribute]))
       .range([this.height, 0]);
 
+    // Seleziona la colormap corretta in base alla variabile selezionata
+    const colorMap = colorMaps[controllerMethods.selectedClass];
     const colorScale = d3.scaleOrdinal()
-      .domain(['Winter', 'Spring', 'Summer', 'Fall'])
-      .range(['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728']);
+      .domain(colorMap.domain)
+      .range(colorMap.range);
 
     const circles = this.svg.selectAll('circle')
       .data(filteredData, d => d.index);
@@ -86,7 +104,7 @@ class AlternativeScatterplotD3 {
       .attr('cy', d => yScale(d[yAttribute]))
       .attr('r', 3.5)
       .attr('stroke', 'black')
-      .attr('fill', d => colorScale(d.Seasons));
+      .attr('fill', d => colorScale(d[controllerMethods.selectedClass]));
 
     // Gestisci l'inserimento di nuovi elementi
     circles.enter()
@@ -95,7 +113,7 @@ class AlternativeScatterplotD3 {
       .attr('cy', d => yScale(d[yAttribute]))
       .attr('r', 0) // Inizia con raggio 0 per l'animazione
       .attr('stroke', 'black')
-      .attr('fill', d => colorScale(d.Seasons))
+      .attr('fill', d => colorScale(d[controllerMethods.selectedClass]))
       .on('click', controllerMethods.handleOnClick)
       .transition()
       .duration(750)

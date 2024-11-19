@@ -1,10 +1,12 @@
 import React, { Component } from 'react';
 import ScatterplotD3 from './Scatter-plot';
 import AlternativeScatterplotD3 from './AlternativeScatterplotD3';
+import Menu from './Menu';
+import ClassSelection from './ClassSelection';
 import { connect } from 'react-redux';
 import { updateSelectedItems } from '../redux/DataSetSlice';
 
-const WIDTH = 500;
+const WIDTH = 700;
 const HEIGHT = 600;
 
 class ScatterPlotContainer extends Component {
@@ -16,7 +18,8 @@ class ScatterPlotContainer extends Component {
     this.scatterplotRef2 = React.createRef();
     this.legendRef = React.createRef();
     this.state = {
-      selectedData: []
+      selectedData: [],
+      selectedClass: 'Seasons' // Variabile per la colorazione o la forma dei punti
     };
   }
 
@@ -33,7 +36,8 @@ class ScatterPlotContainer extends Component {
     this.scatterplot2.create({ size: { width: WIDTH, height: HEIGHT } });
     this.scatterplot2.renderScatterplot(this.state.selectedData, this.props.xAttribute, this.props.yAttribute, {
       handleOnClick: this.handleOnClick,
-      handleBrush: this.handleBrush
+      handleBrush: this.handleBrush,
+      selectedClass: this.state.selectedClass
     });
   }
 
@@ -46,13 +50,19 @@ class ScatterPlotContainer extends Component {
         handleOnClick: this.handleOnClick,
         handleBrush: this.handleBrush
       });
-    }
-
-    if (prevState.selectedData !== this.state.selectedData) {
-      console.log("Selected data updated:", this.state.selectedData);
       this.scatterplot2.renderScatterplot(this.state.selectedData, this.props.xAttribute, this.props.yAttribute, {
         handleOnClick: this.handleOnClick,
-        handleBrush: this.handleBrush
+        handleBrush: this.handleBrush,
+        selectedClass: this.state.selectedClass
+      });
+    }
+
+    if (prevState.selectedData !== this.state.selectedData || prevState.selectedClass !== this.state.selectedClass) {
+      console.log("Selected data or class updated:", this.state.selectedData, this.state.selectedClass);
+      this.scatterplot2.renderScatterplot(this.state.selectedData, this.props.xAttribute, this.props.yAttribute, {
+        handleOnClick: this.handleOnClick,
+        handleBrush: this.handleBrush,
+        selectedClass: this.state.selectedClass
       });
     }
   }
@@ -69,6 +79,10 @@ class ScatterPlotContainer extends Component {
     this.props.updateSelectedItems(selectedItems);
   }
 
+  handleClassChange = (selectedClass) => {
+    this.setState({ selectedClass });
+  }
+
   componentWillUnmount() {
     this.scatterplot1.clear();
     this.scatterplot2.clear();
@@ -76,10 +90,26 @@ class ScatterPlotContainer extends Component {
 
   render() {
     return (
-      <div style={{ display: 'flex' }}>
-        <div ref={this.scatterplotRef1} style={{ width: `${WIDTH}px`, height: `${HEIGHT}px` }}></div>
-        <div ref={this.scatterplotRef2} style={{ width: `${WIDTH}px`, height: `${HEIGHT}px`, marginLeft: '20px' }}></div>
-        <div ref={this.legendRef} style={{ marginLeft: '20px' }}></div>
+      <div style={{ display: 'flex', width: '100%', height: '100vh' }}>
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <Menu onPlot={(x, y) => {
+            this.props.updateSelectedItems([]);
+            this.scatterplot1.renderScatterplot(this.props.data, x, y, {
+              handleOnClick: this.handleOnClick,
+              handleBrush: this.handleBrush
+            });
+            this.scatterplot2.renderScatterplot(this.state.selectedData, x, y, {
+              handleOnClick: this.handleOnClick,
+              handleBrush: this.handleBrush,
+              selectedClass: this.state.selectedClass
+            });
+          }} />
+          <div ref={this.scatterplotRef1} style={{ width: '100%', height: '100%' }}></div>
+        </div>
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <ClassSelection selectedClass={this.state.selectedClass} onClassChange={this.handleClassChange} />
+          <div ref={this.scatterplotRef2} style={{ width: '100%', height: '100%' }}></div>
+        </div>
       </div>
     );
   }

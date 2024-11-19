@@ -146,7 +146,7 @@ class ScatterplotD3 {
           if (x0 <= this.xScale(d[this.xAttribute]) && this.xScale(d[this.xAttribute]) <= x1 &&
               y0 <= this.yScale(d[this.yAttribute]) && this.yScale(d[this.yAttribute]) <= y1) {
             selectedData.push(d);
-            return d.Holiday === "Holiday" ? COLOR_HOLIDAY : COLOR_NO_HOLIDAT;
+            return "red";
           } else {
             return null;
           }
@@ -182,8 +182,10 @@ class ScatterplotD3 {
     }
   }
 
-  setLegendElement(element) {
-    this.legendElement = element;
+  clearBrush() {
+    this.svg.select('.brush').call(this.brush.move, null);
+    this.svg.selectAll('circle').attr('stroke', null);
+    d3.select(this.legendElement).selectAll('*').remove(); // Rimuovi la legenda
   }
 
   clear() {
