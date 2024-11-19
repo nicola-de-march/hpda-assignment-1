@@ -25,8 +25,8 @@ const ParallelCoordinates = ({ data, dimensions, selectedClass }) => {
     if (data.length === 0) return;
 
     const margin = { top: 30, right: 10, bottom: 10, left: 10 };
-    const width = 700 - margin.left - margin.right;
-    const height = 500 - margin.top - margin.bottom;
+    const width = 800 - margin.left - margin.right;
+    const height = 550 - margin.top - margin.bottom;
 
     const svg = d3.select(ref.current)
       .attr('width', width + margin.left + margin.right)
