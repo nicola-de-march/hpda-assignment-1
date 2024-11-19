@@ -1,17 +1,14 @@
 import * as d3 from 'd3';
 
-const COLOR_HOLIDAY = "purple";
-const COLOR_NO_HOLIDAT = "green";
 const OPACITY = 0.2;
 
-class ScatterplotD3 {
-  constructor(element, onBrush) {
+class AlternativeScatterplotD3 {
+  constructor(element) {
     this.element = element;
-    this.onBrush = onBrush;
   }
 
   create({ size }) {
-    console.log("Creating scatterplot with size:", size);
+    console.log("Creating alternative scatterplot with size:", size);
 
     // Definisci i margini
     const margin = { top: 20, right: 30, bottom: 40, left: 50 };
@@ -27,14 +24,6 @@ class ScatterplotD3 {
       .attr('height', size.height)
       .append('g')
       .attr('transform', `translate(${margin.left},${margin.top})`);
-
-    this.brush = d3.brush()
-      .extent([[0, 0], [width, height]])
-      .on('start brush end', this.brushed.bind(this));
-
-    this.svg.append('g')
-      .attr('class', 'brush')
-      .call(this.brush);
 
     // Aggiungi gruppi per gli assi
     this.svg.append('g')
@@ -62,7 +51,7 @@ class ScatterplotD3 {
   }
 
   renderScatterplot(data, xAttribute, yAttribute, controllerMethods) {
-    console.log("Rendering scatterplot with data:", data);
+    console.log("Rendering alternative scatterplot with data:", data);
     console.log("xAttribute:", xAttribute);
     console.log("yAttribute:", yAttribute);
 
@@ -73,6 +62,7 @@ class ScatterplotD3 {
     // Filtra i dati nulli
     const filteredData = data.filter(d => d && d[xAttribute] != null && d[yAttribute] != null);
 
+
     const xScale = d3.scaleLinear()
       .domain(d3.extent(filteredData, d => d[xAttribute]))
       .range([0, this.width]);
@@ -82,8 +72,8 @@ class ScatterplotD3 {
       .range([this.height, 0]);
 
     const colorScale = d3.scaleOrdinal()
-      .domain(["Holiday", "No Holiday"])
-      .range(["blue", "red"]);
+      .domain(['Winter', 'Spring', 'Summer', 'Fall'])
+      .range(['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728']);
 
     const circles = this.svg.selectAll('circle')
       .data(filteredData, d => d.index);
@@ -95,7 +85,8 @@ class ScatterplotD3 {
       .attr('cx', d => xScale(d[xAttribute]))
       .attr('cy', d => yScale(d[yAttribute]))
       .attr('r', 3.5)
-      .attr('fill-opacity', OPACITY)
+      .attr('stroke', 'black')
+      .attr('fill', d => colorScale(d.Seasons));
 
     // Gestisci l'inserimento di nuovi elementi
     circles.enter()
@@ -103,7 +94,8 @@ class ScatterplotD3 {
       .attr('cx', d => xScale(d[xAttribute]))
       .attr('cy', d => yScale(d[yAttribute]))
       .attr('r', 0) // Inizia con raggio 0 per l'animazione
-      .attr('fill-opacity', OPACITY)
+      .attr('stroke', 'black')
+      .attr('fill', d => colorScale(d.Seasons))
       .on('click', controllerMethods.handleOnClick)
       .transition()
       .duration(750)
@@ -132,63 +124,9 @@ class ScatterplotD3 {
     this.svg.select('.y-axis-label').text(yAttribute);
   }
 
-  brushed(event) {
-    const selection = event.selection;
-    if (!selection) {
-      this.svg.selectAll('circle').attr('stroke', null);
-      d3.select(this.legendElement).selectAll('*').remove(); // Rimuovi la legenda
-      this.onBrush([]); // Passa un array vuoto se non c'è selezione
-    } else {
-      const [[x0, y0], [x1, y1]] = selection;
-      const selectedData = [];
-      this.svg.selectAll('circle')
-        .attr('stroke', d => {
-          if (x0 <= this.xScale(d[this.xAttribute]) && this.xScale(d[this.xAttribute]) <= x1 &&
-              y0 <= this.yScale(d[this.yAttribute]) && this.yScale(d[this.yAttribute]) <= y1) {
-            selectedData.push(d);
-            return d.Holiday === "Holiday" ? COLOR_HOLIDAY : COLOR_NO_HOLIDAT;
-          } else {
-            return null;
-          }
-        });
-
-      // Aggiungi la legenda
-      d3.select(this.legendElement).selectAll('*').remove(); // Rimuovi la legenda esistente
-      d3.select(this.legendElement).append('rect')
-        .attr('x', 0)
-        .attr('y', 0)
-        .attr('width', 18)
-        .attr('height', 18)
-        .attr('fill', COLOR_HOLIDAY);
-      d3.select(this.legendElement).append('text')
-        .attr('x', 24)
-        .attr('y', 9)
-        .attr('dy', '0.35em')
-        .text('Holiday');
-
-      d3.select(this.legendElement).append('rect')
-        .attr('x', 0)
-        .attr('y', 24)
-        .attr('width', 18)
-        .attr('height', 18)
-        .attr('fill', COLOR_NO_HOLIDAT);
-      d3.select(this.legendElement).append('text')
-        .attr('x', 24)
-        .attr('y', 33)
-        .attr('dy', '0.35em')
-        .text('No Holiday');
-
-      this.onBrush(selectedData); // Passa i dati selezionati
-    }
-  }
-
-  setLegendElement(element) {
-    this.legendElement = element;
-  }
-
   clear() {
     this.svg.remove();
   }
 }
 
-export default ScatterplotD3;
+export default AlternativeScatterplotD3;
