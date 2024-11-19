@@ -16,9 +16,9 @@ const Menu = ({ onPlot }) => {
         <select value={xAttribute} onChange={e => setXAttribute(e.target.value)}>
           <option value="Temperature">Temperature</option>
           <option value="Humidity">Humidity</option>
-          <option value="WindSpeed">WindSpeed</option>
           <option value="Visibility">Visibility</option>
           <option value="DewPointTemperature">DewPointTemperature</option>
+          <option value="RentedBikeCount">RentedBikeCount</option>
         </select>
       </label>
       <label>
@@ -26,9 +26,9 @@ const Menu = ({ onPlot }) => {
         <select value={yAttribute} onChange={e => setYAttribute(e.target.value)}>
           <option value="Temperature">Temperature</option>
           <option value="Humidity">Humidity</option>
-          <option value="WindSpeed">WindSpeed</option>
           <option value="Visibility">Visibility</option>
           <option value="DewPointTemperature">DewPointTemperature</option>
+          <option value="RentedBikeCount">RentedBikeCount</option>
         </select>
       </label>
       <button onClick={handlePlotClick}>Plot</button>

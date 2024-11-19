@@ -1,7 +1,7 @@
 import * as d3 from 'd3';
 
 const COLOR_HOLIDAY = "purple";
-const COLOR_NO_HOLIDAY = "green";
+const COLOR_NO_HOLIDAT = "green";
 const OPACITY = 0.2;
 
 class ScatterplotD3 {
@@ -13,7 +13,7 @@ class ScatterplotD3 {
     console.log("Creating scatterplot with size:", size);
 
     // Definisci i margini
-    const margin = { top: 20, right: 30, bottom: 40, left: 50 };
+    const margin = { top: 20, right: 30, bottom: 40, left: 80 };
     const width = size.width - margin.left - margin.right;
     const height = size.height - margin.top - margin.bottom;
 
@@ -47,22 +47,22 @@ class ScatterplotD3 {
     this.svg.append('text')
       .attr('class', 'x-axis-label')
       .attr('text-anchor', 'end')
-      .attr('x', width)
-      .attr('y', height + margin.bottom - 5)
+      .attr('x', width /2)
+      .attr('y', height + margin.bottom)
       .text('X Axis Label');
 
     this.svg.append('text')
       .attr('class', 'y-axis-label')
       .attr('text-anchor', 'end')
-      .attr('x', -margin.left + 5)
-      .attr('y', -10)
+      .attr('x', -margin.left)
+      .attr('y', -50)
       .attr('transform', 'rotate(-90)')
       .text('Y Axis Label');
 
     // Aggiungi gruppo per la legenda
     this.legend = this.svg.append('g')
       .attr('class', 'legend')
-      .attr('transform', `translate(${width - 100}, 20)`);
+      .attr('transform', `translate(${width}, 20)`);
   }
 
   renderScatterplot(data, xAttribute, yAttribute, controllerMethods) {
@@ -94,6 +94,8 @@ class ScatterplotD3 {
 
     // Gestisci l'aggiornamento degli elementi esistenti
     circles
+      .transition()
+      .duration(750)
       .attr('cx', d => xScale(d[xAttribute]))
       .attr('cy', d => yScale(d[yAttribute]))
       .attr('r', 3.5)
@@ -104,12 +106,19 @@ class ScatterplotD3 {
       .append('circle')
       .attr('cx', d => xScale(d[xAttribute]))
       .attr('cy', d => yScale(d[yAttribute]))
-      .attr('r', 3.5)
+      .attr('r', 0) // Inizia con raggio 0 per l'animazione
       .attr('fill-opacity', OPACITY)
-      .on('click', controllerMethods.handleOnClick);
+      .on('click', controllerMethods.handleOnClick)
+      .transition()
+      .duration(750)
+      .attr('r', 3.5); // Anima il raggio fino a 3.5
 
     // Gestisci la rimozione degli elementi non più presenti nei dati
-    circles.exit().remove();
+    circles.exit()
+      .transition()
+      .duration(750)
+      .attr('r', 0) // Anima il raggio fino a 0
+      .remove();
 
     // Aggiungi assi
     const xAxis = d3.axisBottom(xScale);
@@ -138,9 +147,9 @@ class ScatterplotD3 {
         .attr('stroke', d => {
           if (x0 <= this.xScale(d[this.xAttribute]) && this.xScale(d[this.xAttribute]) <= x1 &&
               y0 <= this.yScale(d[this.yAttribute]) && this.yScale(d[this.yAttribute]) <= y1) {
-            return d.Holiday === "Holiday" ? COLOR_HOLIDAY : COLOR_NO_HOLIDAY;
+            return d.Holiday === "Holiday" ? COLOR_HOLIDAY : COLOR_NO_HOLIDAT;
           } else {
-            return 'null';
+            return null;
           }
         });
 
@@ -163,7 +172,7 @@ class ScatterplotD3 {
         .attr('y', 24)
         .attr('width', 18)
         .attr('height', 18)
-        .attr('fill', COLOR_NO_HOLIDAY);
+        .attr('fill', COLOR_NO_HOLIDAT);
       this.legend.append('text')
         .attr('x', 24)
         .attr('y', 33)

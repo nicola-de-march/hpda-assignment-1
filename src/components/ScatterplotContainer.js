@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import ScatterplotD3 from './Scatter-plot';
 import { connect } from 'react-redux';
 import { updateSelectedItems } from '../redux/DataSetSlice';
-
+const WIDTH = 1000
+const HEIGHT = 600
 class ScatterPlotContainer extends Component {
   constructor(props) {
     super(props);
@@ -13,7 +14,7 @@ class ScatterPlotContainer extends Component {
   componentDidMount() {
     console.log("ScatterPlotContainer mounted");
     this.scatterplot = new ScatterplotD3(this.scatterplotRef.current);
-    this.scatterplot.create({ size: { width: 800, height: 600 } });
+    this.scatterplot.create({ size: { width: WIDTH, height: HEIGHT } });
     this.scatterplot.renderScatterplot(this.props.data, this.props.xAttribute, this.props.yAttribute, {
       handleOnClick: this.handleOnClick,
       handleBrush: this.handleBrush
@@ -47,7 +48,7 @@ class ScatterPlotContainer extends Component {
   }
 
   render() {
-    return <div ref={this.scatterplotRef} style={{ width: '800px', height: '600px' }}></div>;
+    return <div ref={this.scatterplotRef} style={{ width: toString(WIDTH) +'px', height: toString(HEIGHT)+'px' }}></div>;
   }
 }
 
