@@ -1,12 +1,10 @@
 import React, { useRef, useEffect } from 'react';
 import * as d3 from 'd3';
 
-const OPACITY = 0.2;
-
 const colorMaps = {
   Seasons: {
     domain: ["Spring", "Summer", "Fall", "Winter"],
-    range: ["green", "yellow", "orange", "blue"]
+    range: ["green", "orange", "yellow", "blue"]
   },
   Holiday: {
     domain: ["Yes", "No"],
@@ -16,7 +14,6 @@ const colorMaps = {
     domain: ["Yes", "No"],
     range: ["gray", "purple"]
   }
-  // Aggiungi altre variabili discrete e le loro colormap qui
 };
 
 const AlternativeScatterplotD3 = ({ data, xAttribute, yAttribute, selectedClass, onDotClick }) => {
@@ -64,7 +61,6 @@ const AlternativeScatterplotD3 = ({ data, xAttribute, yAttribute, selectedClass,
     svg.append('g')
       .call(d3.axisLeft(yScale));
 
-    // Aggiorna le etichette degli assi
     svg.append('text')
       .attr('class', 'x-axis-label')
       .attr('text-anchor', 'end')

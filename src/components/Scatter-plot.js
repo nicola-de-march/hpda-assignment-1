@@ -12,9 +12,7 @@ class ScatterplotD3 {
   }
 
   create({ size }) {
-    console.log("Creating scatterplot with size:", size);
 
-    // Definisci i margini
     const margin = { top: 20, right: 40, bottom: 40, left: 80 };
     const width = size.width - margin.left - margin.right;
     const height = size.height - margin.top - margin.bottom;
@@ -37,7 +35,6 @@ class ScatterplotD3 {
       .attr('class', 'brush')
       .call(this.brush);
 
-    // Aggiungi gruppi per gli assi
     this.svg.append('g')
       .attr('class', 'x-axis')
       .attr('transform', `translate(0, ${height})`);
@@ -45,7 +42,6 @@ class ScatterplotD3 {
     this.svg.append('g')
       .attr('class', 'y-axis');
 
-    // Aggiungi etichette degli assi
     this.svg.append('text')
       .attr('class', 'x-axis-label')
       .attr('text-anchor', 'end')
@@ -63,15 +59,10 @@ class ScatterplotD3 {
   }
 
   renderScatterplot(data, xAttribute, yAttribute, controllerMethods) {
-    console.log("Rendering scatterplot with data:", data);
-    console.log("xAttribute:", xAttribute);
-    console.log("yAttribute:", yAttribute);
 
-    // Salva gli attributi come proprietà dell'istanza
     this.xAttribute = xAttribute;
     this.yAttribute = yAttribute;
 
-    // Filtra i dati nulli
     const filteredData = data.filter(d => d && d[xAttribute] != null && d[yAttribute] != null);
 
     const xScale = d3.scaleLinear()
@@ -82,14 +73,9 @@ class ScatterplotD3 {
       .domain(d3.extent(filteredData, d => d[yAttribute]))
       .range([this.height, 0]);
 
-    const colorScale = d3.scaleOrdinal()
-      .domain(["Holiday", "No Holiday"])
-      .range(["blue", "red"]);
-
     const circles = this.svg.selectAll('circle')
       .data(filteredData, d => d.index);
 
-    // Gestisci l'aggiornamento degli elementi esistenti
     circles
       .transition()
       .duration(750)
@@ -98,39 +84,35 @@ class ScatterplotD3 {
       .attr('r', 3.5)
       .attr('fill-opacity', OPACITY)
 
-    // Gestisci l'inserimento di nuovi elementi
     circles.enter()
       .append('circle')
       .attr('cx', d => xScale(d[xAttribute]))
       .attr('cy', d => yScale(d[yAttribute]))
-      .attr('r', 0) // Inizia con raggio 0 per l'animazione
+      .attr('r', 0) 
       .attr('fill-opacity', OPACITY)
       .on('click', (event, d) => {
         this.onDotClick(d, event);
       })
       .transition()
       .duration(750)
-      .attr('r', 3.5); // Anima il raggio fino a 3.5
+      .attr('r', 3.5); 
 
-    // Gestisci la rimozione degli elementi non più presenti nei dati
     circles.exit()
       .transition()
       .duration(750)
-      .attr('r', 0) // Anima il raggio fino a 0
+      .attr('r', 0)
       .remove();
 
-    // Aggiungi assi
     const xAxis = d3.axisBottom(xScale);
     const yAxis = d3.axisLeft(yScale);
 
     this.svg.select('.x-axis').call(xAxis);
     this.svg.select('.y-axis').call(yAxis);
 
-    this.xScale = xScale; // Salva la scala x per l'uso nel metodo brushed
-    this.yScale = yScale; // Salva la scala y per l'uso nel metodo brushed
+    this.xScale = xScale; 
+    this.yScale = yScale;
     this.controllerMethods = controllerMethods;
 
-    // Aggiorna le etichette degli assi
     this.svg.select('.x-axis-label').text(xAttribute);
     this.svg.select('.y-axis-label').text(yAttribute);
   }
@@ -139,8 +121,8 @@ class ScatterplotD3 {
     const selection = event.selection;
     if (!selection) {
       this.svg.selectAll('circle').attr('stroke', null);
-      d3.select(this.legendElement).selectAll('*').remove(); // Rimuovi la legenda
-      this.onBrush([]); // Passa un array vuoto se non c'è selezione
+      d3.select(this.legendElement).selectAll('*').remove(); 
+      this.onBrush([]); 
     } else {
       const [[x0, y0], [x1, y1]] = selection;
       const selectedData = [];
@@ -155,7 +137,6 @@ class ScatterplotD3 {
           }
         });
 
-      // Aggiungi la legenda
       d3.select(this.legendElement).selectAll('*').remove(); // Rimuovi la legenda esistente
       d3.select(this.legendElement).append('rect')
         .attr('x', 0)
@@ -181,14 +162,14 @@ class ScatterplotD3 {
         .attr('dy', '0.35em')
         .text('No Holiday');
 
-      this.onBrush(selectedData); // Passa i dati selezionati
+      this.onBrush(selectedData); 
     }
   }
 
   clearBrush() {
     this.svg.select('.brush').call(this.brush.move, null);
     this.svg.selectAll('circle').attr('stroke', null);
-    d3.select(this.legendElement).selectAll('*').remove(); // Rimuovi la legenda
+    d3.select(this.legendElement).selectAll('*').remove(); 
   }
 
   clear() {

@@ -1,10 +1,12 @@
 import * as d3 from 'd3';
 import React, { useRef, useEffect } from 'react';
 
+const OPACITY = 0.2;
+
 const colorMaps = {
   Seasons: {
     domain: ["Spring", "Summer", "Fall", "Winter"],
-    range: ["green", "yellow", "orange", "blue"]
+    range: ["green", "orange", "yellow", "blue"]
   },
   Holiday: {
     domain: ["Yes", "No"],
@@ -14,7 +16,6 @@ const colorMaps = {
     domain: ["Yes", "No"],
     range: ["gray", "purple"]
   }
-  // Aggiungi altre variabili discrete e le loro colormap qui
 };
 
 const ParallelCoordinates = ({ data, dimensions, selectedClass }) => {
@@ -56,23 +57,21 @@ const ParallelCoordinates = ({ data, dimensions, selectedClass }) => {
     const paths = svg.selectAll('path')
       .data(data, d => d.index);
 
-    // Gestisci l'aggiornamento degli elementi esistenti
+
     paths
       .transition()
-      .duration(750)
+      .duration(500)
       .attr('d', path)
       .style('fill', 'none')
       .style('stroke', d => colorScale(d[selectedClass]))
-      .style('opacity', 0.5);
+      .style('opacity', OPACITY);
 
-    // Gestisci l'inserimento di nuovi elementi
     paths.enter().append('path')
       .attr('d', path)
       .style('fill', 'none')
       .style('stroke', d => colorScale(d[selectedClass]))
-      .style('opacity', 0.1);
+      .style('opacity', OPACITY);
 
-    // Gestisci la rimozione degli elementi non più presenti nei dati
     paths.exit()
       .transition()
       .duration(750)
@@ -85,7 +84,7 @@ const ParallelCoordinates = ({ data, dimensions, selectedClass }) => {
       .attr('class', 'axis')
       .attr('transform', d => `translate(${x(d)})`)
       .each(function(d) {
-        d3.select(this).call(d3.axisLeft(y[d])); // Mostra i valori sugli assi
+        d3.select(this).call(d3.axisLeft(y[d])); 
       })
       .append('text')
       .style('text-anchor', 'middle')

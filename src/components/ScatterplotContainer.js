@@ -7,7 +7,7 @@ import ClassSelection from './ClassSelection';
 import Tooltip from './Tooltip';
 import { connect } from 'react-redux';
 import { updateSelectedItems } from '../redux/DataSetSlice';
-import './Menu.css'; // Importa il file CSS del menu
+import './Menu.css'; 
 
 const WIDTH = 700;
 const HEIGHT = 600;
@@ -19,17 +19,16 @@ class ScatterPlotContainer extends Component {
     this.scatterplotRef1 = React.createRef();
     this.state = {
       selectedData: [],
-      selectedClass: 'Seasons', // Variabile per la colorazione o la forma dei punti
+      selectedClass: 'Seasons', 
       tooltipData: null,
       tooltipPosition: { x: 0, y: 0 },
-      xAttribute: 'Temperature', // Attributo iniziale per l'asse X
-      yAttribute: 'Humidity', // Attributo iniziale per l'asse Y
-      showParallelCoordinates: false // Stato per mostrare il grafico delle coordinate parallele
+      xAttribute: 'Temperature', 
+      yAttribute: 'Humidity', 
+      showParallelCoordinates: false 
     };
   }
 
   componentDidMount() {
-    console.log("ScatterPlotContainer mounted");
     this.scatterplot1 = new ScatterplotD3(this.scatterplotRef1.current, this.handleBrush, this.handleDotClick);
     this.scatterplot1.create({ size: { width: WIDTH, height: HEIGHT } });
     this.scatterplot1.renderScatterplot(this.props.data, this.state.xAttribute, this.state.yAttribute, {
@@ -42,10 +41,7 @@ class ScatterPlotContainer extends Component {
 
   componentDidUpdate(prevProps, prevState) {
     if (prevProps.data !== this.props.data || prevState.xAttribute !== this.state.xAttribute || prevState.yAttribute !== this.state.yAttribute) {
-      console.log("ScatterPlotContainer updated");
-      console.log("xAttribute:", this.state.xAttribute);
-      console.log("yAttribute:", this.state.yAttribute);
-      this.scatterplot1.clearBrush(); // Resetta la selezione e rimuovi la finestra di brush
+      this.scatterplot1.clearBrush(); 
       this.scatterplot1.renderScatterplot(this.props.data, this.state.xAttribute, this.state.yAttribute, {
         handleOnClick: this.handleDotClick,
         handleBrush: this.handleBrush
@@ -72,7 +68,6 @@ class ScatterPlotContainer extends Component {
   }
 
   handleBrush = (selectedItems) => {
-    console.log("Brush selected items:", selectedItems);
     this.setState({ selectedData: selectedItems });
     this.props.updateSelectedItems(selectedItems);
   }

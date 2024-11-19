@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getSeoulBikeData } from './redux/DataSetSlice';
 import ScatterPlotContainer from './components/ScatterplotContainer';
-import Menu from './components/Menu';
 
 function App() {
   const dispatch = useDispatch();
