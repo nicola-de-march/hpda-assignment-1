@@ -1,5 +1,5 @@
 import * as d3 from 'd3';
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 
 const OPACITY = 0.2;
 
@@ -20,6 +20,7 @@ const colorMaps = {
 
 const ParallelCoordinates = ({ data, dimensions, selectedClass }) => {
   const ref = useRef();
+  const [currentDimensions, setCurrentDimensions] = useState(dimensions);
 
   useEffect(() => {
     if (data.length === 0) return;
@@ -37,17 +38,17 @@ const ParallelCoordinates = ({ data, dimensions, selectedClass }) => {
     const x = d3.scalePoint()
       .range([0, width])
       .padding(1)
-      .domain(dimensions);
+      .domain(currentDimensions);
 
     const y = {};
-    for (const dim of dimensions) {
+    for (const dim of currentDimensions) {
       y[dim] = d3.scaleLinear()
         .domain(d3.extent(data, d => +d[dim]))
         .range([height, 0]);
     }
 
     const line = d3.line();
-    const path = d => line(dimensions.map(p => [x(p), y[p](d[p])]));
+    const path = d => line(currentDimensions.map(p => [x(p), y[p](d[p])]));
 
     const colorMap = colorMaps[selectedClass];
     const colorScale = d3.scaleOrdinal()
@@ -56,7 +57,6 @@ const ParallelCoordinates = ({ data, dimensions, selectedClass }) => {
 
     const paths = svg.selectAll('path')
       .data(data, d => d.index);
-
 
     paths
       .transition()
@@ -70,7 +70,17 @@ const ParallelCoordinates = ({ data, dimensions, selectedClass }) => {
       .attr('d', path)
       .style('fill', 'none')
       .style('stroke', d => colorScale(d[selectedClass]))
-      .style('opacity', OPACITY);
+      .style('opacity', OPACITY)
+      .on('mouseover', function(event, d) {
+        d3.select(this)
+          .style('stroke-width', '3px')
+          .style('opacity', 1);
+      })
+      .on('mouseout', function(event, d) {
+        d3.select(this)
+          .style('stroke-width', '1.5px')
+          .style('opacity', OPACITY);
+      });
 
     paths.exit()
       .transition()
@@ -78,8 +88,8 @@ const ParallelCoordinates = ({ data, dimensions, selectedClass }) => {
       .style('opacity', 0)
       .remove();
 
-    svg.selectAll('g.axis')
-      .data(dimensions)
+    const axis = svg.selectAll('g.axis')
+      .data(currentDimensions)
       .enter().append('g')
       .attr('class', 'axis')
       .attr('transform', d => `translate(${x(d)})`)
@@ -92,10 +102,32 @@ const ParallelCoordinates = ({ data, dimensions, selectedClass }) => {
       .text(d => d)
       .style('fill', 'black');
 
+    // Drag and drop functionality for reordering axes
+    const drag = d3.drag()
+      .on('start', function(event, d) {
+        d3.select(this).raise().classed('active', true);
+      })
+      .on('drag', function(event, d) {
+        const xPos = d3.pointer(event)[0];
+        d3.select(this).attr('transform', `translate(${xPos},0)`);
+      })
+      .on('end', function(event, d) {
+        d3.select(this).classed('active', false);
+        const xPos = d3.pointer(event)[0];
+        const newOrder = [...currentDimensions];
+        const oldIndex = newOrder.indexOf(d);
+        const newIndex = Math.round(xPos / (width / (newOrder.length - 1)));
+        newOrder.splice(oldIndex, 1);
+        newOrder.splice(newIndex, 0, d);
+        setCurrentDimensions(newOrder);
+      });
+
+    axis.call(drag);
+
     return () => {
       svg.remove();
     };
-  }, [data, dimensions, selectedClass]);
+  }, [data, currentDimensions, selectedClass]);
 
   return <svg ref={ref}></svg>;
 };
