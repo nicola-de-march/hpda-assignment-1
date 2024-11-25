@@ -52,7 +52,6 @@ const AlternativeScatterplotD3 = ({ data, xAttribute, yAttribute, selectedClass,
       .attr('cy', d => yScale(d[yAttribute]))
       .attr('r', 3.5)
       .attr('fill', d => colorScale(d[selectedClass]))
-      .on('click', onDotClick);
 
     svg.append('g')
       .attr('transform', `translate(0,${height})`)
