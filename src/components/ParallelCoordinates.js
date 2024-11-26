@@ -72,14 +72,18 @@ const ParallelCoordinates = ({ data, dimensions, selectedClass }) => {
       .style('stroke', d => colorScale(d[selectedClass]))
       .style('opacity', OPACITY)
       .on('mouseover', function(event, d) {
-        d3.select(this)
-          .style('stroke-width', '3px')
-          .style('opacity', 1);
+        if (svg.selectAll('.brush').filter(function() { return d3.brushSelection(this); }).empty()) {
+          d3.select(this)
+            .style('stroke-width', '3px')
+            .style('opacity', 1);
+        }
       })
       .on('mouseout', function(event, d) {
-        d3.select(this)
-          .style('stroke-width', '1.5px')
-          .style('opacity', OPACITY);
+        if (svg.selectAll('.brush').filter(function() { return d3.brushSelection(this); }).empty()) {
+          d3.select(this)
+            .style('stroke-width', '1.5px')
+            .style('opacity', OPACITY);
+        }
       });
 
     paths.exit()
