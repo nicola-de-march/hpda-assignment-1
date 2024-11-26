@@ -102,6 +102,42 @@ const ParallelCoordinates = ({ data, dimensions, selectedClass }) => {
       .text(d => d)
       .style('fill', 'black');
 
+    // Brush functionality
+    const brush = d3.brushY()
+      .extent([[-10, 0], [10, height]]) // Aumenta la larghezza del brush e correggi le coordinate
+      .on("start brush end", brushed);
+
+    svg.selectAll('.axis')
+      .append('g')
+      .attr('class', 'brush')
+      .each(function(d) {
+        d3.select(this).call(brush);
+    });
+    
+    function brushed(event) {
+      const actives = [];
+      svg.selectAll('.brush')
+        .filter(function(d) {
+          return d3.brushSelection(this);
+        })
+        .each(function(d) {
+          actives.push({
+            dimension: d,
+            extent: d3.brushSelection(this)
+          });
+        });
+
+      const selected = data.filter(d => {
+        return actives.every(active => {
+          const dim = active.dimension;
+          return active.extent[0] <= y[dim](d[dim]) && y[dim](d[dim]) <= active.extent[1];
+        });
+      });
+
+      svg.selectAll('path')
+        .style('opacity', d => selected.includes(d) ? 0.6 : 0.02);
+    }
+
     // Drag and drop functionality for reordering axes
     const drag = d3.drag()
       .on('start', function(event, d) {
