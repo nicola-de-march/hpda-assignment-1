@@ -108,7 +108,7 @@ const ParallelCoordinates = ({ data, dimensions, selectedClass }) => {
 
     // Brush functionality
     const brush = d3.brushY()
-      .extent([[-10, 0], [10, height]]) // Aumenta la larghezza del brush e correggi le coordinate
+      .extent([[-10, 0], [10, height]]) 
       .on("start brush end", brushed);
 
     svg.selectAll('.axis')

@@ -10,7 +10,6 @@ const ClassSelection = ({ selectedClass, onClassChange }) => {
           <option value="Seasons">Seasons</option>
           <option value="FunctioningDay">FunctioningDay</option>
           <option value="Holiday">Holiday</option>
-          {/* Aggiungi altre opzioni qui */}
         </select>
       </label>
     </div>

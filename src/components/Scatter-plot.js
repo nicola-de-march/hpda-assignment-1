@@ -137,7 +137,7 @@ class ScatterplotD3 {
           }
         });
 
-      d3.select(this.legendElement).selectAll('*').remove(); // Rimuovi la legenda esistente
+      d3.select(this.legendElement).selectAll('*').remove(); 
       d3.select(this.legendElement).append('rect')
         .attr('x', 0)
         .attr('y', 0)
